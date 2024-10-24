@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 SCRIPT_DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 
 
@@ -14,7 +16,7 @@ SOURCE_FOLDER=$1
 DESTINATION_FOLDER=$2
 NOTTOPLEVEL=$3
 TMP_INDEX=${DESTINATION_FOLDER}/index.md
-MARKDOWN="pandoc --from markdown --to html5 --section-divs --mathml --toc --toc-depth=1 -c ./style.css --template=${SCRIPT_DIR}/template.html"
+MARKDOWN="pandoc --from markdown --to html5 --section-divs --mathml --toc --toc-depth=1 -c /style.css --template=${SCRIPT_DIR}/template.html"
 
 
 # check that pandoc is installed
@@ -22,18 +24,23 @@ hash pandoc 2>/dev/null || { echo >&2 "I require 'pandoc' but it's not installed
 
 
 # empty destination folder
-mkdir -p ${DESTINATION_FOLDER}
-rm -rf ${DESTINATION_FOLDER}/*
+mkdir -p "${DESTINATION_FOLDER}"
+rm -rf "${DESTINATION_FOLDER}/"*
 
 # check if index file available
-if [ ! -f ${SOURCE_FOLDER}/index.md ]; then
-	echo "no index.md in ${SOURCE_FOLDER}"
-	exit 1
+INDEX_MD=${SOURCE_FOLDER}/index.md
+if [ ! -f "${INDEX_MD}" ]; then
+	if [ "${NOTTOPLEVEL}" != "ntl" ]; then
+		echo "no index.md in ${SOURCE_FOLDER}"
+		exit 1
+	else
+		INDEX_MD=${SCRIPT_DIR}/index.md
+	fi
 fi
 
 # prepare temporary index file for content links if any md files
-cp ${SOURCE_FOLDER}/index.md ${TMP_INDEX}
-num_md=`ls -al ${SOURCE_FOLDER}/*.md | grep -c md`
+cp "${INDEX_MD}" "${TMP_INDEX}"
+num_md=`ls -al "${SOURCE_FOLDER}/"*.md | grep -c md`
 if [ $num_md -gt 1 ]; then
 	printf "\n\n# Articles\n\n" >> ${TMP_INDEX}
 fi
@@ -42,7 +49,7 @@ fi
 echo "${SOURCE_FOLDER}"
 
 # iterate over markdown files in subdirectory
-for file in ${SOURCE_FOLDER}/*.md
+for file in "${SOURCE_FOLDER}/"*.md
 do
 	# extract file name without path
 	file=${file##*/}
@@ -61,46 +68,46 @@ do
 	FILE_NAME=${file%.*}
 	FILE_LINK=./${FILE_NAME}.html
 
-	# get file description of file title marked by starting %
-	FILE_DESC=$(sed -n -e 's/^.*% //p' ${SOURCE_FILE} | head -1)
-
 	# do processing
-	${MARKDOWN} --variable backtoindex ${SOURCE_FILE} >> ${DEST_FILE}
+	${MARKDOWN} --variable backtoindex "${SOURCE_FILE}" >> "${DEST_FILE}"
 
 	# insert entry in index file
-	printf "* [${FILE_DESC}](${FILE_LINK})\n" >> ${TMP_INDEX}
+	printf "* [${FILE_NAME}](${FILE_LINK})\n" >> "${TMP_INDEX}"
 done
 
 # copy all other files than .md
-find ${SOURCE_FOLDER} -maxdepth 1 -type f -not -name "*.md" -exec cp {} ${DESTINATION_FOLDER} \;
+find "${SOURCE_FOLDER}" -maxdepth 1 -type f -not -name "*.md" -not -name "*.sql" -not -name "*.xml" -exec cp {} "${DESTINATION_FOLDER}" \;
+find "${SOURCE_FOLDER}" -maxdepth 1 -type d -name "_Assets" -exec cp -r {} "${DESTINATION_FOLDER}" \;
 
 # prepare index file for sub dir links if any
-num_child=`ls -al ${SOURCE_FOLDER} | grep -c ^d`
-if [ $num_child -gt 2 ]; then
-	printf "\n\n# Sub Articles\n\n" >> ${TMP_INDEX}
+num_child=`ls -al "${SOURCE_FOLDER}" | grep -c ^d`
+if [ $num_child -gt 2 ] && [ "${NOTTOPLEVEL}" != "ntl" ]; then
+	printf "\n\n# Customers\n\n" >> "${TMP_INDEX}"
 fi
 
 # iterate over all sub directories with index file
-for sub in ${SOURCE_FOLDER}/*/
+for sub in "${SOURCE_FOLDER}/"*/
 do
 	# extract file name without path
-	sub=$(basename ${sub})
-	SOURCE_SUB=${SOURCE_FOLDER}/${sub}
-	DEST_SUB=${DESTINATION_FOLDER}/${sub}
-
-	# check if index file available
-	if [ ! -f ${SOURCE_SUB}/index.md ]; then
+	sub=$(basename "${sub}")
+	if [ "${sub}" = "*" ]; then
 		continue
 	fi
 
-	# get file description of file title marked by starting %
-	FILE_DESC=$(sed -n -e 's/^.*% //p' ${SOURCE_SUB}/index.md | head -1)
+	SOURCE_SUB=${SOURCE_FOLDER}/${sub}
+	DEST_SUB=${DESTINATION_FOLDER}/${sub}
+
+	# check if there is any md file
+	count=`ls -1 "${SOURCE_SUB}/"*.md 2>/dev/null | wc -l`
+	if [ $count == 0 ]; then
+		continue
+	fi
 
 	# insert entry in index file
-	printf "* [${FILE_DESC}](./${sub}/index.html)\n" >> ${TMP_INDEX}
+	printf "* [${sub}](./${sub}/index.html)\n" >> "${TMP_INDEX}"
 
 	# recursive process sub folders
-	$0 ${SOURCE_SUB} ${DEST_SUB} "ntl"
+	$0 "${SOURCE_SUB}" "${DEST_SUB}" "ntl"
 done
 
 # define if this is the top level index which needs not back link
@@ -110,9 +117,11 @@ if [ ! -z ${NOTTOPLEVEL} ]; then
 fi
 
 # process temporary index file
-${MARKDOWN} ${TOPTOINDEX} ${TMP_INDEX} >> ${DESTINATION_FOLDER}/index.html
+${MARKDOWN} ${TOPTOINDEX} "${TMP_INDEX}" >> "${DESTINATION_FOLDER}/index.html"
 #rm ${TMP_INDEX}
 
 # copy in style
-cp ${SCRIPT_DIR}/style.css ${DESTINATION_FOLDER}
-cp ${SCRIPT_DIR}/back.png ${DESTINATION_FOLDER}
+if [ "${NOTTOPLEVEL}" != "ntl" ]; then
+	cp ${SCRIPT_DIR}/style.css "${DESTINATION_FOLDER}"
+	cp ${SCRIPT_DIR}/back.png "${DESTINATION_FOLDER}"
+fi
