@@ -16,11 +16,7 @@ SOURCE_FOLDER=$1
 DESTINATION_FOLDER=$2
 NOTTOPLEVEL=$3
 TMP_INDEX=${DESTINATION_FOLDER}/index.md
-MARKDOWN="pandoc --from markdown --to html5 --section-divs --mathml --toc --toc-depth=1 -c /style.css --template=${SCRIPT_DIR}/template.html"
-
-
-# check that pandoc is installed
-hash pandoc 2>/dev/null || { echo >&2 "I require 'pandoc' but it's not installed.  Aborting."; exit 1; }
+MARKDOWN="./bin/pandoc --from markdown --to html5 --section-divs --mathml --toc --toc-depth=1 -c /style.css --template=${SCRIPT_DIR}/template.html"
 
 
 # empty destination folder
