@@ -16,7 +16,7 @@ SOURCE_FOLDER=$1
 DESTINATION_FOLDER=$2
 NOTTOPLEVEL=$3
 TMP_INDEX=${DESTINATION_FOLDER}/index.md
-MARKDOWN="./bin/pandoc --from markdown --to html5 --section-divs --mathml --toc --toc-depth=1 -c /style.css --template=${SCRIPT_DIR}/template.html"
+MARKDOWN="./bin/pandoc --from markdown --to html5 --section-divs --mathml --toc --toc-depth=1 -c //style.css --template=${SCRIPT_DIR}/template.html"
 
 
 # empty destination folder
