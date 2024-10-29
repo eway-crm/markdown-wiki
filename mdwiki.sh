@@ -113,7 +113,7 @@ if [ ! -z ${NOTTOPLEVEL} ]; then
 fi
 
 # process temporary index file
-${MARKDOWN} --metadata title="${DESTINATION_FOLDER}" ${TOPTOINDEX} "${TMP_INDEX}" >> "${DESTINATION_FOLDER}/index.html"
+${MARKDOWN} --metadata title="$(basename "${DESTINATION_FOLDER}")" ${TOPTOINDEX} "${TMP_INDEX}" >> "${DESTINATION_FOLDER}/index.html"
 #rm ${TMP_INDEX}
 
 # copy in style
