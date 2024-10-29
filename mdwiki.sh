@@ -65,7 +65,7 @@ do
 	FILE_LINK=./${FILE_NAME}.html
 
 	# do processing
-	${MARKDOWN} --variable backtoindex "${SOURCE_FILE}" >> "${DEST_FILE}"
+	${MARKDOWN} --metadata title="${FILE_NAME}" --variable backtoindex "${SOURCE_FILE}" >> "${DEST_FILE}"
 
 	# insert entry in index file
 	printf "* [${FILE_NAME}](${FILE_LINK})\n" >> "${TMP_INDEX}"
@@ -113,7 +113,7 @@ if [ ! -z ${NOTTOPLEVEL} ]; then
 fi
 
 # process temporary index file
-${MARKDOWN} ${TOPTOINDEX} "${TMP_INDEX}" >> "${DESTINATION_FOLDER}/index.html"
+${MARKDOWN} --metadata title="${DESTINATION_FOLDER}" ${TOPTOINDEX} "${TMP_INDEX}" >> "${DESTINATION_FOLDER}/index.html"
 #rm ${TMP_INDEX}
 
 # copy in style
