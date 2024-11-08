@@ -29,8 +29,16 @@ $endif$
 $for(header-includes)$
   $header-includes$
 $endfor$
+  <link href="/pagefind/pagefind-ui.css" rel="stylesheet">
+  <script src="/pagefind/pagefind-ui.js"></script>
 </head>
 <body>
+<div id="search"></div>
+<script>
+    window.addEventListener('DOMContentLoaded', (event) => {
+      new PagefindUI({ element: "#search", showSubResults: true });
+    });
+</script>
 <div id="content">
 $for(include-before)$
 $include-before$
