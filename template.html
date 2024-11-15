@@ -31,7 +31,7 @@ $for(header-includes)$
 $endfor$
   <link href="/pagefind/pagefind-ui.css" rel="stylesheet">
   <script src="/pagefind/pagefind-ui.js"></script>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.conditional.min.css">
 </head>
 <body>
 <div id="search"></div>
@@ -40,7 +40,7 @@ $endfor$
       new PagefindUI({ element: "#search", showSubResults: true });
     });
 </script>
-<div id="content">
+<div id="content" class="pico">
 $for(include-before)$
 $include-before$
 $endfor$
