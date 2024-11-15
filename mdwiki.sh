@@ -119,5 +119,4 @@ ${MARKDOWN} --metadata title="$(basename "${DESTINATION_FOLDER}")" ${TOPTOINDEX}
 # copy in style
 if [ "${NOTTOPLEVEL}" != "ntl" ]; then
 	cp ${SCRIPT_DIR}/style.css "${DESTINATION_FOLDER}"
-	cp ${SCRIPT_DIR}/back.png "${DESTINATION_FOLDER}"
 fi
