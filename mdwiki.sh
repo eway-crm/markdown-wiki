@@ -78,7 +78,7 @@ find "${SOURCE_FOLDER}" -maxdepth 1 -type d -name "_Assets" -exec cp -r {} "${DE
 # prepare index file for sub dir links if any
 num_child=`ls -al "${SOURCE_FOLDER}" | grep -c ^d`
 if [ $num_child -gt 2 ] && [ "${NOTTOPLEVEL}" != "ntl" ]; then
-	printf "\n\n# Customers\n\n" >> "${TMP_INDEX}"
+	printf "\n\n# Articles\n\n" >> "${TMP_INDEX}"
 fi
 
 # iterate over all sub directories with index file
